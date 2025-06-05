@@ -1,0 +1,20 @@
+# Entorno virtual
+venv/
+ENV/
+env/
+*.pyc
+__pycache__/
+
+# Base de datos SQLite local
+local.db
+
+# Migraciones (si prefieres no versionar todo el historial de Alembic)
+migrations/
+
+# Variables de entorno
+.env
+
+# IDEs o sistemas operativos
+.vscode/
+.idea/
+.DS_Store
