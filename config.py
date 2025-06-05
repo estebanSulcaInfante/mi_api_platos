@@ -1,5 +1,5 @@
 # config.py
-
+from datetime import timedelta
 import os
 
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -14,5 +14,8 @@ class Config:
     SQLALCHEMY_DATABASE_URI = url
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
+    # Cambiar la expiración del access token a 24 horas
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=24)
+    
     SECRET_KEY = os.environ.get("SECRET_KEY", "mi_clave_por_defecto_muy_secreta")
     JWT_SECRET_KEY = SECRET_KEY
