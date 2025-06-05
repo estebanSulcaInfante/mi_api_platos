@@ -9,6 +9,7 @@ from flask_jwt_extended import (
     jwt_required,
     get_jwt_identity
 )
+from flask_cors import CORS
 from config import Config
 from models import db, Administrador, Categoria, Plato
 
@@ -21,6 +22,12 @@ def create_app():
     migrate = Migrate(app, db)
     jwt = JWTManager(app)
 
+    # ─── Habilitar CORS global para cualquier origen ───
+    # Con esto, cualquier petición HTTP (GET, POST, PUT, DELETE, etc.)
+    # desde cualquier dominio (Origin: *) podrá llamar a tus endpoints /api/*
+    CORS(app, origins="*")
+
+    
     # --------------------------
     # RUTAS PÚBLICAS: Registro / Login
     # --------------------------
