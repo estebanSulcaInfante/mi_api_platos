@@ -1,5 +1,4 @@
 # app.py
-
 import os
 from flask import Flask, request, jsonify
 from flask_migrate import Migrate
@@ -12,11 +11,12 @@ from flask_jwt_extended import (
 from flask_cors import CORS
 from config import Config
 from models import db, Administrador, Categoria, Plato
+from blueprints.galeria import galeria_bp
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
-
+    app.register_blueprint(galeria_bp)
     # Inicializar extensiones
     db.init_app(app)
     migrate = Migrate(app, db)
@@ -27,35 +27,10 @@ def create_app():
     # desde cualquier dominio (Origin: *) podrá llamar a tus endpoints /api/*
     CORS(app, origins="*")
 
-    
+ 
     # --------------------------
-    # RUTAS PÚBLICAS: Registro / Login
+    # RUTAS PÚBLICAS: Login
     # --------------------------
-
-    @app.route("/api/register", methods=["POST"])
-    def register():
-        """
-        Registro de un nuevo administrador.
-        Body JSON: { "nombre": "Juan", "email": "juan@ejemplo.com", "password": "abc123" }
-        """
-        data = request.get_json() or {}
-        nombre = data.get("nombre")
-        email = data.get("email")
-        password = data.get("password")
-
-        if not nombre or not email or not password:
-            return jsonify({"error": "Faltan campos obligatorios: 'nombre', 'email' o 'password'"}), 400
-
-        # Verificar que no exista ya ese email
-        if Administrador.query.filter_by(email=email).first():
-            return jsonify({"error": "Ya existe un administrador con ese email"}), 409
-
-        admin = Administrador(nombre=nombre, email=email)
-        admin.set_password(password)
-        db.session.add(admin)
-        db.session.commit()
-
-        return jsonify({"mensaje": "Administrador creado exitosamente"}), 201
 
     @app.route("/api/login", methods=["POST"])
     def login():
@@ -84,6 +59,33 @@ def create_app():
     # --------------------------
     # RUTAS PROTEGIDAS (solo administradores autenticados)
     # --------------------------
+
+    @app.route("/api/register", methods=["POST"])
+    @jwt_required()
+    def register():
+        """
+        Registro de un nuevo administrador.
+        Body JSON: { "nombre": "Juan", "email": "juan@ejemplo.com", "password": "abc123" }
+        """
+        data = request.get_json() or {}
+        nombre = data.get("nombre")
+        email = data.get("email")
+        password = data.get("password")
+
+        if not nombre or not email or not password:
+            return jsonify({"error": "Faltan campos obligatorios: 'nombre', 'email' o 'password'"}), 400
+
+        # Verificar que no exista ya ese email
+        if Administrador.query.filter_by(email=email).first():
+            return jsonify({"error": "Ya existe un administrador con ese email"}), 409
+
+        admin = Administrador(nombre=nombre, email=email)
+        admin.set_password(password)
+        db.session.add(admin)
+        db.session.commit()
+
+        return jsonify({"mensaje": "Administrador creado exitosamente"}), 201
+  
 
     # ─── CRUD para Categoría ───
 
